@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import TopMenu from "@/components/TopMenu";
+import Footer from "@/components/Footer";
 import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/authOptions";
 import NextAuthProvider from "@/providers/NextAuthProvider";
-import {authOptions} from "@/app/api/auth/[...nextauth]/authOptions"
 import ReduxProvider from "@/redux/ReduxProvider";
-
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,17 +20,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  const session = await getServerSession(authOptions)
+  const nextAuthSession = await getServerSession(authOptions);
 
   return (
     <html lang="en">
       <body className={inter.className}>
         <ReduxProvider>
-        <NextAuthProvider session={session}>
-        <TopMenu/>
-        {children}
-        </NextAuthProvider>
+          <NextAuthProvider session={nextAuthSession}>
+            <TopMenu />
+            {children}
+            <Footer/>
+          </NextAuthProvider>
         </ReduxProvider>
       </body>
     </html>

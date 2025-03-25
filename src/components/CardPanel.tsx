@@ -1,68 +1,71 @@
 "use client"
-import { useReducer, useEffect, useState } from "react";
+
+import { useReducer,useState } from "react";
 import Card from "./Card";
 import Link from "next/link";
-import getVenues from "@/libs/getVenues";
-import { VenueItem, VenueJson } from "../../interface";
+import { CarItem,CarsJson } from "../../interface";
 
-export default function CardPanel(){
+export default function CardPanel() {
 
-        const [venueResponse,setVenueResponse] = useState<VenueJson|null>(null)
+    let defaultCar = new Map<string, number>([
+        ["The Bloom Pavilion", 0],
+        ["Spark Space", 0],
+        ["The Grand Table", 0]
+    ]);
 
-        useEffect(()=>{
-                const fetchData = async () => {
-                        const venues = await getVenues()
-                        setVenueResponse(venues)
+    const cardReducer = (
+        carList: Map<string, number>, action: { type: string; carName: string; rating?: number }
+    ) => {
+        const newCarList = new Map(carList);
+        switch(action.type) {
+            case 'add' : {
+                newCarList.set(action.carName, action.rating??0);
+                return newCarList;
+            }
+            case 'remove' : {
+                newCarList.delete(action.carName);
+                return newCarList
+            }
+            default: return carList;
+        }
+    }
+
+    const [ carList, dispatchCompare ] = useReducer(cardReducer, defaultCar);
+    const [carResponse, setCarResponse] = useState<CarsJson|null>(null)
+
+
+    const mockCarRepo = [
+        {cid: "001", name: "The Bloom Pavilion", image: "/img/bloom.jpg"},
+        {cid: "002", name: "Spark Space", image: "/img/sparkspace.jpg"},
+        {cid: "003", name: "The Grand Table", image: "/img/grandtable.jpg"},
+
+    ]
+
+    if(!carResponse) return (<p>Car Panel is Loading...</p>)
+
+    return (
+        <div>
+            <div className="m-[20px] flex flex-row flew-wrap justify-around content-around">
+                {
+                    carResponse.data.map((carItem:CarItem) => (
+                        <Link href={`/car/${carItem.id}`} className="w-1/5">
+                            <Card carName={carItem.brand} imgSrc={carItem.picture} onRatingChange={(car : string, rate : number) => dispatchCompare({type : 'add', carName : car, rating : rate})}/>
+                        </Link>
+                    ))
                 }
-
-                fetchData()
-        }, [])
-
-        const defaultVenue = new Map<string, number>([
-                ["The Bloom Pavilion", 0],
-                ["Spark Space", 0],
-                ["The Grand Table", 0]
-            ]);
-
-            const compareReducer = (
-                compareList: Map<string, number>, 
-                action: { type: string; venueName: string; rating?: number }
-            ) => {
-                switch (action.type) {
-                    case 'add': {
-                        return new Map(compareList).set(action.venueName, action.rating ?? 0);
-                    }
-                    case 'remove': {
-                        const newList = new Map(compareList);
-                        newList.delete(action.venueName);
-                        return newList;
-                    }
-                    default:
-                        return compareList;
-                }
-            };
-            
-
-        const [compareList, dispatchCompare] = useReducer(compareReducer, defaultVenue)
-
-        if(!venueResponse) return (<p>Venue Panel is Loading ... </p>)
-
-        return (
-                <div>
-                        <div style={{margin:"20px", display:"flex",flexDirection:"row",
-                                flexWrap:"wrap",justifyContent:"space-around",alignContent:"space-around"}}>
-                                {venueResponse.data.map((venueItem:VenueItem)=>(
-                                        <Link href={`/venue/${venueItem.id}`} className="w-1/5">
-                                        <Card venueName={venueItem.name} imgSrc={venueItem.picture}
-                                        onCompare={(value:number)=>dispatchCompare({type:"add",venueName:venueItem.name,rating:value})}/>
-                                        </Link>
-                                ))
-                                }
-                        </div>
-                        <div className="w-full text-xl font-medium">Compare List : {compareList.size}</div>
-                        {Array.from(compareList).map(([venueName, rating]) => (
-                                <div key={venueName} data-testid={venueName} onClick={() => dispatchCompare({ type: "remove", venueName })}>{venueName} : {rating}</div>
-                        ))}
-                </div>
-        );
+            </div>
+            <div className="pl-[20px]">
+                <div className="w-full text-xl font-medium">Car List with Rating: {carList.size}</div>
+                {Array.from(carList).map(([carName, rating]) => (
+                    <div 
+                        key={carName} 
+                        data-testid={carName} 
+                        onClick={() => dispatchCompare({ type: "remove", carName })}
+                    >
+                        {carName} Rating: {rating}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }

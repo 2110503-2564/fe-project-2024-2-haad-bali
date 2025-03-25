@@ -1,27 +1,37 @@
-export interface VenueItem {
-    _id: string,
-    name: string,
-    address: string,
-    district: string,
-    province: string,
-    postalcode: string,
-    tel: string,
-    picture: string,
-    dailyrate: number,
-    __v: number,
-    id: string
-  }
-  
-export  interface VenueJson {
-    success: boolean,
-    count: number,
-    pagination: Object,
-    data: VenueItem[]
-  }
+import { StringExpression } from "mongoose"
+
+export interface ReservationItem {
+  carId: string
+  carModel: string;
+  pickupdate: string;
+  returndate: string;
+}
+
+// must edit
+
+export interface CarItem {
+  _id: string,
+  brand: string,
+  seat: string,
+  gearType: string,
+  price: string,
+  pickupaddress: string,
+  picture: string,
+  __v: number,
+  id: string
+}
+
+export interface CarsJson {
+  success: boolean,
+  count: number,
+  pagination: Object,
+  data: CarItem[]
+}
 
 export  interface BookingItem {
-    nameLastname: string;
-    tel: string;
-    venue: string;
-    bookDate: string;
-  }
+  nameLastname: string;
+  tel: string;
+  car: string;
+  pickupdate: string;
+  returndate: string;
+}
