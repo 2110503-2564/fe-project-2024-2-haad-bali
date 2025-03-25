@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import TopMenu from "@/components/TopMenu";
-import Footer from "@/components/Footer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/authOptions";
 import NextAuthProvider from "@/providers/NextAuthProvider";
@@ -29,7 +28,6 @@ export default async function RootLayout({
           <NextAuthProvider session={nextAuthSession}>
             <TopMenu />
             {children}
-            <Footer/>
           </NextAuthProvider>
         </ReduxProvider>
       </body>

@@ -49,22 +49,25 @@ export default function Booking() {
             alert("Please fill in all required fields.");
         }
     }
-    return(
-        <main className="w-[100%] flex flex-col items-center space-y-4">
+    return (
+        <main className="w-[100%] flex flex-col items-center space-y-4 bg-[#F9F3EF] min-h-screen">
             <div className="text-xl font-medium">Car Booking</div>
-            {brand? <div className="text-xl font-medium">Car {brand}</div>:null}
-            
-        <DateReserve
+            {brand ? <div className="text-xl font-medium">Car {brand}</div> : null}
+    
+            <DateReserve
                 onPickupDateChange={(value: Dayjs) => setPickupDate(value)}
                 onReturnDateChange={(value: Dayjs) => setReturnDate(value)}
                 onLocationChange={(value: string) => setCar(value)}
-        />
-
-            <button name="Book Car" className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2 text-white shadow-sm"
-            onClick={makeReservation}>
-               Book Car 
+            />
+    
+            <button
+                name="Book Car"
+                className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2 text-white shadow-sm"
+                onClick={makeReservation}
+            >
+                Book Car
             </button>
         </main>
-    )
+    );    
 
 }

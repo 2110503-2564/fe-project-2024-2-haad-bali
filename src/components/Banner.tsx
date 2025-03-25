@@ -1,54 +1,32 @@
-"use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./banner.module.css";
-import Image from "next/image";
-import {useSession} from 'next-auth/react'
-
+'use client'
+import styles from './banner.module.css';
+import Image from 'next/image';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function Banner() {
-  const covers = ["/img/cover.jpg", "/img/cover2.jpg", "/img/cover3.jpg", "/img/cover4.jpg"];
-  const [index, setIndex] = useState(0);
-  const router = useRouter();
 
-  const {data:session} = useSession()
-  //console.log(session);
-  // console.log(session?.user.token);
+    const router = useRouter();
+    const [index,setState] = useState(0);
+    const bannerList = ["/img/1.png",'/img/2.png','/img/3.png']
 
-  return (
-    <div
-      className={styles.banner}
-      onClick={() => {
-        setIndex(index + 1);
-        alert(index % 4);
-      }}
-    >
-      <Image
-        src={covers[index % 4]}
-        alt="cover"
-        fill={true}
-        priority
-        objectFit="cover"
-      />
+    const {data:session} = useSession()
+    console.log(session?.user.token)
 
-      <div className={styles.bannerText}>
-        <h1 className="text-4xl font-medium">
-          where every event finds its car
-        </h1>
-        <h3 className="text-xl font-serif">
-          Renting the perfect car has never been easier. Whether it's a
-          wedding corporate event, or private party, we are always connecting people to the
-          perfect place.
-        </h3>
-      </div>
-      {
-        /*session?<div className="z-30 absolute top-5 right-10 font-semibold text-cyan-800 text-xl">Welcome {session.user?.name}</div>:null*/
-      }
-      <button className='bg-white text-blue-900 border border-blue-900
-      font-semibold py-2 px-2 m-5 rounded z-30 absolute bottom-0 right-0 
-      hover:bg-blue-900 hover:text-white hover:boder-transparent' onClick={(e) => { e.stopPropagation(); router.push('/car') }}>
-        Select Your Car
-      </button>
-    </div>
-  );
-}
+    return (
+        <div className={styles.banner} onClick={()=>{setState(index+1)}}>
+            <Image src = {bannerList[index%3]} 
+            alt = 'cover'
+            fill = {true}
+            priority
+            objectFit='cover'
+            />
+            {
+                session? <div className ='z-30 absolute top- left-10 font-semibold text-cyan-800 text-xl'>Welcome {session.user?.name}</div>
+                : null
+            }
+            <button className="absolute bottom-5 right-5 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-lg shadow-md transition z-50" onClick={(e)=>{e.stopPropagation(),router.push('/car')}}>Select Car</button>
+        </div>
+    )
+} 
