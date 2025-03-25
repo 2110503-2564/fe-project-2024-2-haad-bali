@@ -1,12 +1,11 @@
 import Banner from "@/components/Banner";
-import Footer from "@/components/Footer";
-// import { TravelCard } from "./TravelCard";
+// import TravelCard from "./TravelCard";
 
 export default function Home() {
   return (
-    <main>
+    <main className="bg-[#F9F3EF]">
       <Banner />
-      {/* <TravelCard></TravelCard> */}
+      {/* <TravelCard /> */}
     </main>
   );
 }

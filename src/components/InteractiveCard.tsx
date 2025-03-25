@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+
+import React, { useState } from "react";
 
 export default function InteractiveCard({
   children,
@@ -8,33 +9,14 @@ export default function InteractiveCard({
   children: React.ReactNode;
   Element: string;
 }) {
-  function onCarSelected() {
-    alert("You select " + Element);
-  }
+  const [isHovered, setIsHovered] = useState(false);
 
-  function onCardMouseAction(event: React.SyntheticEvent) {
-    if (event.type == "mouseover") {
-      event.currentTarget.classList.remove('shadow-lg');
-      event.currentTarget.classList.remove('bg-white');
-
-      event.currentTarget.classList.add('bg-neutral-200');
-      event.currentTarget.classList.add('shadow-2xl');
-    }
-    else {
-      event.currentTarget.classList.remove('shadow-2xl');
-      event.currentTarget.classList.remove('bg-neutral-200');
-
-      event.currentTarget.classList.add('bg-white');
-      event.currentTarget.classList.add('shadow-lg');
-    }
-  }
 
   return (
     <div
-      className="w-full h-[300px] rounded-lg shadow-lg bg-white"
-      // onClick={() => onCarSelected()}
-      onMouseOver={(e) => onCardMouseAction(e)}
-      onMouseOut={(e) => onCardMouseAction(e)}
+      className={`w-[410px] h-[440px] rounded-lg ${isHovered ? 'bg-neutral-200 shadow-2xl' : 'bg-white shadow-lg'} transition-all`}
+      onMouseOver={() => setIsHovered(true)}
+      onMouseOut={() => setIsHovered(false)}
     >
       {children}
     </div>
