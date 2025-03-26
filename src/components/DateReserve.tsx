@@ -1,37 +1,37 @@
-"use client"
-import { DatePicker } from "@mui/x-date-pickers"
-import { LocalizationProvider } from "@mui/x-date-pickers"
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-import { Select, MenuItem } from "@mui/material"
-import TextField from '@mui/material/TextField';
-import dayjs, { Dayjs } from "dayjs"
-import { useState } from "react"
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import { useState, useEffect } from "react";
 
-export default function DateReserve({onPickupDateChange, onReturnDateChange}:
-        {onPickupDateChange:Function,onReturnDateChange:Function}
-){
-        const [pickupDate,setPickupDate] = useState<Dayjs|null>(null)
-        const [returnDate,setReturnDate] = useState<Dayjs|null>(null)
-        const [car,setCar] = useState('Toyota Yaris')
+export default function DateReserve({ onPickupDateChange, onReturnDateChange }: 
+    { onPickupDateChange: Function, onReturnDateChange: Function}) {
 
-        return (
-                <div className="bg-slate-100 rounded-lg space-x-5
-                space-y-2 w-fit p-10 flex flex-col justify-center">
+    const [pickupDate, setPickupDate] = useState<Dayjs | null>(null);
+    const [returnDate, setReturnDate] = useState<Dayjs | null>(null);
 
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker className="bg-white"
-                        value={pickupDate}
-                        onChange={(value)=>{onPickupDateChange(value)}}
-                        />
-                        </LocalizationProvider>
+    // Ensure parent component receives the updated values
+    useEffect(() => {
+        onPickupDateChange(pickupDate);
+        onReturnDateChange(returnDate);
+    }, [pickupDate, returnDate]); // Run whenever date values change
 
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker className="bg-white"
-                        value={returnDate}
-                        onChange={(value)=>{onReturnDateChange(value)}}
-                        />
-                        </LocalizationProvider>
+    return (
+        <div className="bg-slate-100 rounded-lg space-y-4 w-fit p-5 flex flex-col justify-center">
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                    label="Pickup Date"
+                    value={pickupDate}
+                    onChange={(value) => setPickupDate(value)}
+                />
+            </LocalizationProvider>
 
-                </div>
-        );
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                    label="Return Date"
+                    value={returnDate}
+                    onChange={(value) => setReturnDate(value)}
+                />
+            </LocalizationProvider>
+        </div>
+    );
 }

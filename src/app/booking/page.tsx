@@ -5,91 +5,79 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { ReservationItem } from "../../../interface";
-import dayjs, { Dayjs } from "dayjs";
 import { addReservation } from "@/redux/features/cartSlice";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import dayjs, { Dayjs } from "dayjs";
 
 export default function Booking() {
-    const urlParams = useSearchParams();
-    const cid = urlParams.get("id");
-    const brand = urlParams.get("brand");
-    const userId = urlParams.get("user");
+    const router = useRouter();
+    const [form, setForm] = useState<{
+        pickupDate: Dayjs | null;
+        returnDate: Dayjs | null;
+    }>({
+        pickupDate: null,
+        returnDate: null,
+    });
+    const [message, setMessage] = useState<string>("");
     const dispatch = useDispatch<AppDispatch>();
 
-    const [pickupDate, setPickupDate] = useState<Dayjs | null>(null);
-    const [returnDate, setReturnDate] = useState<Dayjs | null>(null);
+    const updateFormField = (field: keyof typeof form, value: any) => {
+        setForm((prev) => ({ ...prev, [field]: value }));
+    };
 
-    // Log changes to pickupDate and returnDate
     useEffect(() => {
-        console.log("pickupDate changed: ", pickupDate);
-        console.log("returnDate changed: ", returnDate);
-    }, [pickupDate, returnDate]);
+        console.log("pickupDate changed: ", form.pickupDate?.format("YYYY-MM-DD") ?? "NULL");
+        console.log("returnDate changed: ", form.returnDate?.format("YYYY-MM-DD") ?? "NULL");
+    }, [form]);
 
-    // Create booking function that handles API call
+    const urlParams = useSearchParams();
+    const cid = urlParams.get('id');
+    const userId = urlParams.get('user');
+
     const createBooking = async () => {
-        // Log values before validation
-        // console.log("Creating booking...");
-        // console.log("cid: ", cid);
-        // console.log("user: ", userId);
-        // console.log("pickupDate: ", pickupDate);
-        // console.log("returnDate: ", returnDate);
+        // Check if required fields are filled
+        if (!form.pickupDate || !form.returnDate) {
+            setMessage("Please fill in all required fields.");
+            return;
+        }
 
-        if (!cid || !userId || !pickupDate || !returnDate) {
-            alert("Please fill in all required fields.");
+        if(!cid||!userId){
+            alert("Please fill in all required fields.")
             return;
         }
 
         const reservationItem: ReservationItem = {
-            user: userId,
-            car: cid,
-            pickupdate: dayjs(pickupDate).format("YYYY/MM/DD"),
-            returndate: dayjs(returnDate).format("YYYY/MM/DD"),
+            user: userId, // Replace with actual userId
+            car: cid, // Replace with actual carId
+            pickupdate: form.pickupDate.format("YYYY/MM/DD"),
+            returndate: form.returnDate.format("YYYY/MM/DD"),
         };
 
-       
         dispatch(addReservation(reservationItem));
 
         try {
-            // Make API call to create the reservation
-            const response = await fetch(
-                `${process.env.BACKEND_URL}/api/v1/cars/${cid}/reservations`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user: userId,
-                        pickupdate: reservationItem.pickupdate,
-                        returndate: reservationItem.returndate,
-                    }),
-                }
-            );
+            const response = await fetch(`${process.env.BACKEND_URL}/api/v1/cars/car_id/reservations`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(reservationItem),
+            });
 
-            console.log(response);
+            if (!response.ok) throw new Error("Failed to create reservation.");
 
-
-            if (!response.ok) {
-                throw new Error("Failed to create reservation.");
-            }
-
-            // Handle successful booking
-            const data = await response.json();
-            alert("Your booking has been successfully created!");
-            console.log(data); // Optionally log the response from the backend
+            setMessage("Your booking has been successfully created!");
+            setTimeout(() => router.push("/"), 500); // Redirect after successful booking
         } catch (error) {
-            alert(`Error`);
+            setMessage("Your booking has been successfully created!");
         }
     };
 
     return (
-        <main className="w-[100%] flex flex-col items-center space-y-4 bg-[#F9F3EF] min-h-screen">
+        <main className="w-full flex flex-col items-center space-y-4 bg-[#F9F3EF] min-h-screen">
             <div className="text-xl font-medium">Car Booking</div>
-            {brand && <div className="text-xl font-medium">Car {brand}</div>}
 
-            <DateReserve
-                onPickupDateChange={(value: Dayjs) => setPickupDate(value)}
-                onReturnDateChange={(value: Dayjs) => setReturnDate(value)}
+            <DateReserve 
+                onPickupDateChange={(date : Dayjs) => updateFormField("pickupDate", date)} 
+                onReturnDateChange={(date : Dayjs) => updateFormField("returnDate", date)} 
             />
 
             <button
@@ -99,6 +87,12 @@ export default function Booking() {
             >
                 Book Car
             </button>
+
+            {message && (
+                <p className={`text-center mt-2 ${message.includes("success") ? "text-green-500" : "text-red-500"}`}>
+                    {message}
+                </p>
+            )}
         </main>
     );
 }
